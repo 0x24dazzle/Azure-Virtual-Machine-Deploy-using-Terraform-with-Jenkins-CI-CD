@@ -67,9 +67,6 @@ resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
 }
 
 # Pre-generated SSH key
-variable "admin_ssh_public_key" {
-  description = "Public SSH Key for VM Access"
-}
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
