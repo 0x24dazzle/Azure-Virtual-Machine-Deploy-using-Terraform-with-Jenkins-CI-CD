@@ -1,6 +1,6 @@
 variable "resource_group_name" {
   description = "Name of the resource group"
-  default     = "test-jenkins"
+  default     = "test-jenkins2"
 }
 
 variable "location" {
