@@ -77,5 +77,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "22_04-lts-gen2"
     version   = "latest"
   }
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = var.admin_ssh_public_key
+  }
 }
 
