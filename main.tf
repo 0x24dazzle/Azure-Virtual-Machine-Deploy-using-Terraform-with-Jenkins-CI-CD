@@ -1,41 +1,37 @@
 resource "azurerm_resource_group" "rg" {
-  location = var.resource_group_location
-  name     = "basic-terraform-RG"
+  name     = var.resource_group_name
+  location = var.location
 }
 
-# Create virtual network
-resource "azurerm_virtual_network" "my_terraform_network" {
-  name                = "basic-terraform-network"
+resource "azurerm_virtual_network" "vnet" {
+  name                = "myVnet"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 }
 
-# Create subnet
-resource "azurerm_subnet" "my_terraform_subnet" {
-  name                 = "basic-terraform-subnet"
+resource "azurerm_subnet" "subnet" {
+  name                 = "mySubnet"
   resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.my_terraform_network.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-# Create public IP
-resource "azurerm_public_ip" "my_terraform_public_ip" {
-  name                = "basic-terraform-PublicIP"
+resource "azurerm_public_ip" "public_ip" {
+  name                = "myPublicIP"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
 }
 
-# Create Network Security Group and rule
-resource "azurerm_network_security_group" "my_terraform_nsg" {
-  name                = "basic-terraform-NSG"
+resource "azurerm_network_security_group" "nsg" {
+  name                = "myNSG"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
     name                       = "SSH"
-    priority                   = 100
+    priority                   = 1000
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -46,51 +42,40 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
   }
 }
 
-# Create network interface
-resource "azurerm_network_interface" "my_terraform_nic" {
-  name                = "basic-terraform-NIC"
+resource "azurerm_network_interface" "nic" {
+  name                = "myNIC"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
-    name                          = "basic-nic-config"
-    subnet_id                     = azurerm_subnet.my_terraform_subnet.id
+    name                          = "myNICConfig"
+    subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip.id
+    public_ip_address_id          = azurerm_public_ip.public_ip.id
   }
 }
 
-# Associate NSG with NIC
-resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
-  network_interface_id      = azurerm_network_interface.my_terraform_nic.id
-  network_security_group_id = azurerm_network_security_group.my_terraform_nsg.id
-}
-
-# Pre-generated SSH key
-
-# Create virtual machine
-resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
-  name                  = "basic-terraform-VM"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
-  size                  = "Standard_B1s"
+resource "azurerm_linux_virtual_machine" "vm" {
+  name                = "myVM"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  size                = "Standard_B1s"
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
+  network_interface_ids = [
+    azurerm_network_interface.nic.id,
+  ]
 
   os_disk {
-    name                 = "basic-terraform-osdisk"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "22.04-LTS"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
     version   = "latest"
   }
-
-  admin_username                  = "adminuser"
-  disable_password_authentication = true
-
 }
 
