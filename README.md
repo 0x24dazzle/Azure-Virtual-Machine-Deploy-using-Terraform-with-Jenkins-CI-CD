@@ -143,14 +143,11 @@ Or through Jenkins pipeline by adding a destroy stage.
 - All resources use basic naming convention with "basic-terraform-" prefix
 - The configuration is designed for development/testing purposes
 
-## 🤝 Contributing
+## 💼 Client Showcase
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test the deployment
-5. Submit a pull request
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+This project demonstrates expertise in:
+- Infrastructure as Code (IaC) using Terraform
+- Azure cloud services and resource management
+- CI/CD pipeline automation with Jenkins
+- DevOps best practices and automation
+- Linux virtual machine deployment and configuration
